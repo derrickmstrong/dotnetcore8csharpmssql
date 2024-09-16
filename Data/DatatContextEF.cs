@@ -1,11 +1,21 @@
 // Purpose: To create a class that will be used to connect to the database using Entity Framework.
 using HelloWorld.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace HelloWorld.Data
 {
     public class DataContextEF : DbContext
     {
+        // IConfiguration _config - This is a variable that stores the configuration settings for the application - readonly means it can only be set in the constructor
+        private readonly IConfiguration _config;
+
+        // DataContextEF constructor
+        public DataContextEF(IConfiguration config)
+        {
+            _config = config;
+        }
+
         public DbSet<Computer>? Computer { get; set; } // This is a property that represents a table in the database that stores Computer objects
 
         // This is a constructor that takes a DbContextOptions object as a parameter and passes it to the base class constructor (DbContext)
@@ -13,7 +23,8 @@ namespace HelloWorld.Data
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Server=localhost;Database=DotNetCourseDatabase;TrustServerCertificate=true;Trusted_Connection=false;Uid=sa;Pwd=SQLConnect1;", 
+                // This is a method that specifies the database provider to use when connecting to the database server using Entity Framework
+                optionsBuilder.UseSqlServer(_config.GetConnectionString("DefaultConnection"), 
                 options => options.EnableRetryOnFailure()); // This is a connection string that specifies the server, database, and credentials to use when connecting to the database server using SQL Server
             }
         }

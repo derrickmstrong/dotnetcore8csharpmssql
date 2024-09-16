@@ -1,5 +1,6 @@
 ﻿using HelloWorld.Models; // This is a using directive that allows you to use the Computer class from the HelloWorld.Models namespace
-using HelloWorld.Data; // This is a using directive that allows you to use the DataContextEF class from the HelloWorld.Data namespace
+using HelloWorld.Data;
+using Microsoft.Extensions.Configuration; // This is a using directive that allows you to use the DataContextEF class from the HelloWorld.Data namespace
 
 namespace HelloWorld
 {
@@ -7,8 +8,11 @@ namespace HelloWorld
     {
         private static void Main(string[] args)
         {
+            // iConfiguration configuration - This is a variable that stores the configuration settings for the application
+            IConfiguration config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+
             // Create an instance of the DataContext class
-            DataContextEF ef = new();
+            DataContextEF ef = new DataContextEF(config);
 
             // Create an instance of the Computer class
             Computer myComputer = new()
