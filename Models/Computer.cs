@@ -3,6 +3,7 @@ namespace HelloWorld.Models
 {
     public class Computer
     {
+        public int ComputerId { get; internal set; } // This is a property that represents the primary key of the table
         public string Motherboard { get; set; } = "";
         public int CPUCores { get; set; }
         public bool HasWifi { get; set; }
