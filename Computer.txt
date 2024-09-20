@@ -1,0 +1,8 @@
+Motherboard: XPS 24 Turbo
+CPUCores: 15
+HasWifi: True
+HasLTE: True
+ReleaseDate: 9/16/2024 12:00:00 AM
+Price: 3999.99
+VideoCard: Intel Iris Xe3.5
+

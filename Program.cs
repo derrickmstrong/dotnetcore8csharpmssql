@@ -8,11 +8,6 @@ namespace HelloWorld
     {
         private static void Main(string[] args)
         {
-            // iConfiguration configuration - This is a variable that stores the configuration settings for the application
-            IConfiguration config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
-
-            // Create an instance of the DataContext class
-            DataContextEF ef = new DataContextEF(config);
 
             // Create an instance of the Computer class
             Computer myComputer = new()
@@ -26,22 +21,48 @@ namespace HelloWorld
                 VideoCard = "Intel Iris Xe3.5"
             };
 
-            // Add the computer to the database
-            ef.Add(myComputer);
+            string sql = "INSERT INTO Computer (Motherboard, CPUCores, HasWifi, HasLTE, ReleaseDate, Price, VideoCard) VALUES (@Motherboard, @CPUCores, @HasWifi, @HasLTE, @ReleaseDate, @Price, @VideoCard)";
 
-            // Save the changes to the database
-            ef.SaveChanges();
+            // Write the SQL to a file - this will overwrite the file
+            // File.WriteAllText("Computer.txt", sql);
+            // Close the file
+            // File.Close();
 
-            // Create a query to select all computers from the database using Entity Framework
-            IEnumerable<Computer>? computersEF = ef.Computer?.ToList<Computer>();
-
-            if (computersEF != null)
+            // Write to stream - this will append to the file
+            using (StreamWriter stream = new("Computer.txt", true))
             {
-                foreach (Computer computer in computersEF)
+                stream.WriteLine("Motherboard: " + myComputer.Motherboard);
+                stream.WriteLine("CPUCores: " + myComputer.CPUCores);
+                stream.WriteLine("HasWifi: " + myComputer.HasWifi);
+                stream.WriteLine("HasLTE: " + myComputer.HasLTE);
+                stream.WriteLine("ReleaseDate: " + myComputer.ReleaseDate);
+                stream.WriteLine("Price: " + myComputer.Price);
+                stream.WriteLine("VideoCard: " + myComputer.VideoCard + "\n");
+                // close the stream
+                stream.Close();
+            }
+
+            // Write SQL to stream - this will append to the file
+            using (StreamWriter stream = new("ComputerSQL.txt", true))
+            {
+                stream.WriteLine(sql + "\n");
+                // close the stream
+                stream.Close();
+            }
+
+            // Read from stream - this will read the file
+            using (StreamReader stream = new("Computer.txt"))
+            {
+                string line;
+                while ((line = stream.ReadLine()) != null)
                 {
-                    Console.WriteLine(computer.ComputerId);
+                    Console.WriteLine(line);
                 }
             }
+
+            // Read all text from file - this will read the file
+            string text = File.ReadAllText("Computer.txt");
+            Console.WriteLine(text);
         }
     }
 }
