@@ -1,7 +1,7 @@
 ﻿using HelloWorld.Models; // This is a using directive that allows you to use the Computer class from the HelloWorld.Models namespace
 using HelloWorld.Data;
 using Microsoft.Extensions.Configuration;
-using System.Text.Json; // This is a using directive that allows you to use the JsonSerializer class from the System.Text.Json namespace
+using Newtonsoft.Json; // This is a using directive that allows you to use the JsonConvert class from the Newtonsoft.Json namespace
 
 namespace HelloWorld
 {
@@ -36,16 +36,8 @@ namespace HelloWorld
             string computersJson = File.ReadAllText("Computers.json");
             // Console.WriteLine(computersJson);
             
-
-            // Json Options - Create an instance of the JsonSerializerOptions class - This class allows you to configure the behavior of the JsonSerializer class
-            JsonSerializerOptions options = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                WriteIndented = true
-            };
-
-            // Deserialize JSON file - Convert JSON to C# object (IEnumerable<Computer>) using JsonSerializer class - This class allows you to serialize and deserialize objects
-            IEnumerable<Computer>? computers = JsonSerializer.Deserialize<IEnumerable<Computer>>(computersJson, options);
+            // Deserialize JSON file - Convert JSON to C# object (IEnumerable<Computer>) using JsonConvert.DeserializeObject method
+            IEnumerable<Computer>? computers = JsonConvert.DeserializeObject<IEnumerable<Computer>>(computersJson);
 
             if (computers != null)
             {
