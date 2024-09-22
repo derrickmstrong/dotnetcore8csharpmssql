@@ -1,6 +1,7 @@
 ﻿using HelloWorld.Models; // This is a using directive that allows you to use the Computer class from the HelloWorld.Models namespace
 using HelloWorld.Data;
-using Microsoft.Extensions.Configuration; // This is a using directive that allows you to use the DataContextEF class from the HelloWorld.Data namespace
+using Microsoft.Extensions.Configuration;
+using System.Text.Json; // This is a using directive that allows you to use the JsonSerializer class from the System.Text.Json namespace
 
 namespace HelloWorld
 {
@@ -8,61 +9,52 @@ namespace HelloWorld
     {
         private static void Main(string[] args)
         {
+            // Configuration builder
+            IConfiguration config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", true, true)
+                .Build();
+
+            // Create an instance of the DapperContext class
+            DataContextDapper dapper = new DataContextDapper(config);
 
             // Create an instance of the Computer class
-            Computer myComputer = new()
+            // Computer myComputer = new()
+            // {
+            //     Motherboard = "XPS 24 Turbo",
+            //     CPUCores = 15,
+            //     HasWifi = true,
+            //     HasLTE = true,
+            //     ReleaseDate = new DateTime(2024, 9, 16),
+            //     Price = 3999.99m,
+            //     VideoCard = "Intel Iris Xe3.5"
+            // };
+
+            // Create sql insert statement
+            // string sql = "INSERT INTO Computer (Motherboard, CPUCores, HasWifi, HasLTE, ReleaseDate, Price, VideoCard) VALUES (@Motherboard, @CPUCores, @HasWifi, @HasLTE, @ReleaseDate, @Price, @VideoCard)";
+
+            // Log/Read JSON file
+            string computersJson = File.ReadAllText("Computers.json");
+            // Console.WriteLine(computersJson);
+            
+
+            // Json Options - Create an instance of the JsonSerializerOptions class - This class allows you to configure the behavior of the JsonSerializer class
+            JsonSerializerOptions options = new JsonSerializerOptions
             {
-                Motherboard = "XPS 24 Turbo",
-                CPUCores = 15,
-                HasWifi = true,
-                HasLTE = true,
-                ReleaseDate = new DateTime(2024, 9, 16),
-                Price = 3999.99m,
-                VideoCard = "Intel Iris Xe3.5"
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
             };
 
-            string sql = "INSERT INTO Computer (Motherboard, CPUCores, HasWifi, HasLTE, ReleaseDate, Price, VideoCard) VALUES (@Motherboard, @CPUCores, @HasWifi, @HasLTE, @ReleaseDate, @Price, @VideoCard)";
+            // Deserialize JSON file - Convert JSON to C# object (IEnumerable<Computer>) using JsonSerializer class - This class allows you to serialize and deserialize objects
+            IEnumerable<Computer>? computers = JsonSerializer.Deserialize<IEnumerable<Computer>>(computersJson, options);
 
-            // Write the SQL to a file - this will overwrite the file
-            // File.WriteAllText("Computer.txt", sql);
-            // Close the file
-            // File.Close();
-
-            // Write to stream - this will append to the file
-            using (StreamWriter stream = new("Computer.txt", true))
+            if (computers != null)
             {
-                stream.WriteLine("Motherboard: " + myComputer.Motherboard);
-                stream.WriteLine("CPUCores: " + myComputer.CPUCores);
-                stream.WriteLine("HasWifi: " + myComputer.HasWifi);
-                stream.WriteLine("HasLTE: " + myComputer.HasLTE);
-                stream.WriteLine("ReleaseDate: " + myComputer.ReleaseDate);
-                stream.WriteLine("Price: " + myComputer.Price);
-                stream.WriteLine("VideoCard: " + myComputer.VideoCard + "\n");
-                // close the stream
-                stream.Close();
-            }
-
-            // Write SQL to stream - this will append to the file
-            using (StreamWriter stream = new("ComputerSQL.txt", true))
-            {
-                stream.WriteLine(sql + "\n");
-                // close the stream
-                stream.Close();
-            }
-
-            // Read from stream - this will read the file
-            using (StreamReader stream = new("Computer.txt"))
-            {
-                string line;
-                while ((line = stream.ReadLine()) != null)
+                foreach (var computer in computers)
                 {
-                    Console.WriteLine(line);
+                    Console.WriteLine(computer.Motherboard);
                 }
             }
 
-            // Read all text from file - this will read the file
-            string text = File.ReadAllText("Computer.txt");
-            Console.WriteLine(text);
         }
     }
 }
