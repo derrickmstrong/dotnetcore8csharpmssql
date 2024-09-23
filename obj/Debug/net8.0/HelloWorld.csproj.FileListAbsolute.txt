@@ -75,3 +75,4 @@
 /Users/derrickstrong/Programming/udemy/c-sharp-dotnet-core-8-mssql/HelloWorld/bin/Debug/net8.0/Microsoft.Extensions.FileProviders.Physical.dll
 /Users/derrickstrong/Programming/udemy/c-sharp-dotnet-core-8-mssql/HelloWorld/bin/Debug/net8.0/Microsoft.Extensions.FileSystemGlobbing.dll
 /Users/derrickstrong/Programming/udemy/c-sharp-dotnet-core-8-mssql/HelloWorld/bin/Debug/net8.0/appsettings.json
+/Users/derrickstrong/Programming/udemy/c-sharp-dotnet-core-8-mssql/HelloWorld/bin/Debug/net8.0/Newtonsoft.Json.dll

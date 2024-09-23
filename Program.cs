@@ -1,7 +1,9 @@
-﻿using HelloWorld.Models; // This is a using directive that allows you to use the Computer class from the HelloWorld.Models namespace
+﻿using HelloWorld.Models;
 using HelloWorld.Data;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json; // This is a using directive that allows you to use the JsonConvert class from the Newtonsoft.Json namespace
+using System.Text.Json;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace HelloWorld
 {
@@ -17,36 +19,67 @@ namespace HelloWorld
             // Create an instance of the DapperContext class
             DataContextDapper dapper = new DataContextDapper(config);
 
-            // Create an instance of the Computer class
-            // Computer myComputer = new()
-            // {
-            //     Motherboard = "XPS 24 Turbo",
-            //     CPUCores = 15,
-            //     HasWifi = true,
-            //     HasLTE = true,
-            //     ReleaseDate = new DateTime(2024, 9, 16),
-            //     Price = 3999.99m,
-            //     VideoCard = "Intel Iris Xe3.5"
-            // };
-
-            // Create sql insert statement
-            // string sql = "INSERT INTO Computer (Motherboard, CPUCores, HasWifi, HasLTE, ReleaseDate, Price, VideoCard) VALUES (@Motherboard, @CPUCores, @HasWifi, @HasLTE, @ReleaseDate, @Price, @VideoCard)";
-
             // Log/Read JSON file
             string computersJson = File.ReadAllText("Computers.json");
             // Console.WriteLine(computersJson);
-            
-            // Deserialize JSON file - Convert JSON to C# object (IEnumerable<Computer>) using JsonConvert.DeserializeObject method
-            IEnumerable<Computer>? computers = JsonConvert.DeserializeObject<IEnumerable<Computer>>(computersJson);
 
-            if (computers != null)
+            // Create JsonSerializerOptions object with JsonNamingPolicy.CamelCase option and WriteIndented option
+            JsonSerializerOptions options = new JsonSerializerOptions
             {
-                foreach (var computer in computers)
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
+            };
+
+            // Deserialize JSON file - Convert JSON to C# object (IEnumerable<Computer>) using JsonConvert.DeserializeObject method
+            IEnumerable<Computer>? computersNewtonsoft = JsonConvert.DeserializeObject<IEnumerable<Computer>>(computersJson);
+
+            // Deserialize JSON file - Convert JSON to C# object (IEnumerable<Computer>) using System.Text.Json.JsonSerializer.Deserialize method
+            IEnumerable<Computer>? computersSystem = System.Text.Json.JsonSerializer.Deserialize<IEnumerable<Computer>>(computersJson, options);
+
+            // Settings for JSON serialization with ContractResolver and Formatting.Indented options
+            JsonSerializerSettings settings = new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                Formatting = Formatting.Indented
+            };
+
+            // Serialize C# object to JSON string using JsonConvert.SerializeObject method with Formatting.Indented option
+            string computersJsonNewtonsoft = JsonConvert.SerializeObject(computersNewtonsoft, settings);
+            // Write JSON file - Save JSON string to a file using File.WriteAllText method with the file name "ComputersCopyNewtonsoft.json"
+            File.WriteAllText("ComputersCopyNewtonsoft.json", computersJsonNewtonsoft);
+
+            // Serialize C# object to JSON string using System.Text.Json.JsonSerializer.Serialize method with options
+            string computersJsonSystem = System.Text.Json.JsonSerializer.Serialize(computersSystem, options);
+            // Write JSON file - Save JSON string to a file using File.WriteAllText method with the file name "ComputersCopySystem.json"
+            // File.WriteAllText("ComputersCopySystem.json", computersJsonSystem);
+
+            // Loop through the computersNewtonsoft collection
+            if (computersNewtonsoft != null)
+            {
+                foreach (Computer computer in computersNewtonsoft)
                 {
-                    Console.WriteLine(computer.Motherboard);
+                    // Insert statement with parameterized query
+                    string sqlInsert = "INSERT INTO TutorialAppSchema.Computer (Motherboard, CPUCores, HasWifi, HasLTE, ReleaseDate, Price, VideoCard) VALUES ('"
+                        + EscapeSingleQuote(computer.Motherboard) + "',"
+                        + computer.CPUCores + ","
+                        + (computer.HasWifi ? 1 : 0) + ","
+                        + (computer.HasLTE ? 1 : 0) + ",'"
+                        + (computer.ReleaseDate?.ToString("yyyy-MM-dd") ?? "1900-01-01") + "',"
+                        + computer.Price + ",'"
+                        + EscapeSingleQuote(computer.VideoCard) + "')";
+                    // Execute the sql insert statement with parameterized query
+                    dapper.ExecuteSql(sqlInsert);
+
+                    // Console.WriteLine(computer.Motherboard);
                 }
             }
+        }
 
+        // Escape single quote
+        private static string EscapeSingleQuote(string input)
+        {
+            string output = input.Replace("'", "''");
+            return output;
         }
     }
 }
