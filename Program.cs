@@ -21,7 +21,6 @@ namespace HelloWorld
 
             // Log/Read JSON file
             string computersJson = File.ReadAllText("Computers.json");
-            // Console.WriteLine(computersJson);
 
             // Create JsonSerializerOptions object with JsonNamingPolicy.CamelCase option and WriteIndented option
             JsonSerializerOptions options = new JsonSerializerOptions
@@ -35,23 +34,6 @@ namespace HelloWorld
 
             // Deserialize JSON file - Convert JSON to C# object (IEnumerable<Computer>) using System.Text.Json.JsonSerializer.Deserialize method
             IEnumerable<Computer>? computersSystem = System.Text.Json.JsonSerializer.Deserialize<IEnumerable<Computer>>(computersJson, options);
-
-            // Settings for JSON serialization with ContractResolver and Formatting.Indented options
-            JsonSerializerSettings settings = new JsonSerializerSettings
-            {
-                ContractResolver = new CamelCasePropertyNamesContractResolver(),
-                Formatting = Formatting.Indented
-            };
-
-            // Serialize C# object to JSON string using JsonConvert.SerializeObject method with Formatting.Indented option
-            string computersJsonNewtonsoft = JsonConvert.SerializeObject(computersNewtonsoft, settings);
-            // Write JSON file - Save JSON string to a file using File.WriteAllText method with the file name "ComputersCopyNewtonsoft.json"
-            File.WriteAllText("ComputersCopyNewtonsoft.json", computersJsonNewtonsoft);
-
-            // Serialize C# object to JSON string using System.Text.Json.JsonSerializer.Serialize method with options
-            string computersJsonSystem = System.Text.Json.JsonSerializer.Serialize(computersSystem, options);
-            // Write JSON file - Save JSON string to a file using File.WriteAllText method with the file name "ComputersCopySystem.json"
-            // File.WriteAllText("ComputersCopySystem.json", computersJsonSystem);
 
             // Loop through the computersNewtonsoft collection
             if (computersNewtonsoft != null)
@@ -69,8 +51,6 @@ namespace HelloWorld
                         + EscapeSingleQuote(computer.VideoCard) + "')";
                     // Execute the sql insert statement with parameterized query
                     dapper.ExecuteSql(sqlInsert);
-
-                    // Console.WriteLine(computer.Motherboard);
                 }
             }
         }
